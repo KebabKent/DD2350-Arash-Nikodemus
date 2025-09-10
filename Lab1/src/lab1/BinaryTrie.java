@@ -1,17 +1,15 @@
 package lab1;
 
 public class BinaryTrie {
-    DynamicArray array;
+    // DynamicArray array;
     Stack stack;
     TreeNode root;
-    int size;
     int height;
 
     private BinaryTrie() {
-        this.array = new DynamicArray();
+        // this.array = new DynamicArray();
         this.stack = new Stack();
-        this.root = new TreeNode(null, null, null);
-        this.size = 0;
+        this.root = new TreeNode(0); // The root value is the size of the trie.
         this.height = 4;
     }
 
@@ -27,42 +25,53 @@ public class BinaryTrie {
             return null;
         }
 
-        System.out.println("Dynamic Array------------------------------------");
-        TreeNode newNode = new TreeNode(value, null, null);
-        trie.array.addNode(newNode);
-        trie.array.printArray();
-        System.out.println();
+        trie.stack.push(trie.root);
+        TreeNode newRoot = new TreeNode(trie.root.value);
 
-        System.out.println("Binary Trie------------------------------------");
         TreeNode currentNode = trie.root;
+        TreeNode replacementNode = newRoot;
         int directionBit;
-        i--;
+        i--; // This is to push the 1 from 001 to 100 and then back again. We missed this in
+             // the theory questions where we took h - 1 instead of h - 2.
 
         while (i >= 0) {
-
             directionBit = (index & (1 << i)) >> i;
 
             if (directionBit == 1) {
                 System.out.print("1 ");
-                if (currentNode.right == null) {
-                    currentNode.right = new TreeNode(null, null, null);
+                if (currentNode != null) {
+                    replacementNode.left = currentNode.left;
+                    currentNode = currentNode.right;
                 }
-                currentNode = currentNode.right;
+
+                replacementNode.right = new TreeNode();
+                replacementNode = replacementNode.right;
             } else {
                 System.out.print("0 ");
-                if (currentNode.left == null) {
-                    currentNode.left = new TreeNode(null, null, null);
+
+                if (currentNode != null) {
+                    replacementNode.right = currentNode.right;
+                    currentNode = currentNode.left;
                 }
-                currentNode = currentNode.left;
+
+                replacementNode.left = new TreeNode();
+                replacementNode = replacementNode.left;
             }
             i--;
 
         }
 
-        currentNode.value = value;
-        trie.size++;
+        if (currentNode == null) {
+            newRoot.value = trie.root.value + 1;
+        }
+
+        replacementNode.value = value;
+        trie.root = newRoot;
 
         System.out.println();
+
+        System.out.println("Size " + trie.root.value);
+
         System.out.println();
 
         return trie;
@@ -99,17 +108,17 @@ public class BinaryTrie {
                 }
                 currentNode = currentNode.left;
             }
-            System.out.println(currentNode.value + "\n");
-
             i--;
         }
-
-        System.out.println(currentNode.value + "\n");
 
         return currentNode.value;
     }
 
     public static BinaryTrie unset(BinaryTrie trie) {
+        if (trie.stack.size > 0) {
+            trie.root = trie.stack.pop();
+        }
+
         return trie;
     }
 }
