@@ -7,10 +7,9 @@ public class BinaryTrie {
     int height;
 
     private BinaryTrie() {
-        // this.array = new DynamicArray();
         this.stack = new Stack();
         this.root = new TreeNode(0); // The root value is the size of the trie.
-        this.height = 4;
+        this.height = 32; // 2^(height - 1) = number of leaves. Last index is number of leaves - 1.
     }
 
     public static BinaryTrie newarray() {
@@ -21,8 +20,9 @@ public class BinaryTrie {
     public static BinaryTrie set(BinaryTrie trie, int index, int value) {
 
         int i = trie.height - 1;
-        if (index >= 1 << i) {
-            return null;
+        if ((index / 2) >= (1 << (i - 1))) {// only issue is if i-1 is not i-1 and instead i it goes out of bound and
+                                            // back to 1
+            return trie;
         }
 
         trie.stack.push(trie.root);
@@ -38,7 +38,7 @@ public class BinaryTrie {
             directionBit = (index & (1 << i)) >> i;
 
             if (directionBit == 1) {
-                System.out.print("1 ");
+                // System.out.print("1 ");
                 if (currentNode != null) {
                     replacementNode.left = currentNode.left;
                     currentNode = currentNode.right;
@@ -47,7 +47,7 @@ public class BinaryTrie {
                 replacementNode.right = new TreeNode();
                 replacementNode = replacementNode.right;
             } else {
-                System.out.print("0 ");
+                // System.out.print("0 ");
 
                 if (currentNode != null) {
                     replacementNode.right = currentNode.right;
@@ -68,11 +68,11 @@ public class BinaryTrie {
         replacementNode.value = value;
         trie.root = newRoot;
 
-        System.out.println();
+        // System.out.println();
 
-        System.out.println("Size " + trie.root.value);
+        // System.out.println("Size " + trie.root.value);
 
-        System.out.println();
+        // System.out.println();
 
         return trie;
     }
@@ -80,7 +80,10 @@ public class BinaryTrie {
     public static int get(BinaryTrie trie, int index) {
 
         int i = trie.height - 1;
-        if (index >= 1 << (trie.height - 1)) {
+        if ((index / 2) >= (1 << (i - 1))) {// only issue is if i-1 is not i-1 and instead i it goes out of bound and
+                                            // back to 1
+            // System.out.println("Input Error:" + " your index " + index + " is larger than
+            // " + (1 << i));
             return 0;
         }
 
@@ -92,17 +95,17 @@ public class BinaryTrie {
             directionBit = (index & (1 << i)) >> i;
 
             if (directionBit == 1) {
-                System.out.print("1 ");
+                // System.out.print("1 ");
                 if (currentNode.right == null) {
-                    System.out.println("Null");
+                    // System.out.println("Null");
 
                     return 0;
                 }
                 currentNode = currentNode.right;
             } else {
-                System.out.print("0 ");
+                // System.out.print("0 ");
                 if (currentNode.left == null) {
-                    System.out.println("Null");
+                    // System.out.println("Null");
 
                     return 0;
                 }
