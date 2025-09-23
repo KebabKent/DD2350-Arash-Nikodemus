@@ -7,7 +7,10 @@ public class PartDist2 {
 
     public PartDist2(String w) {
         int wLen = w.length();
-        dynProgMat = new int[wLen + 1][90]; // Längsta ordet i SAOL är 28 bokstäver. Det är 21 i ordlistan
+        dynProgMat = new int[wLen + 1][90]; // Längsta ordet i SAOL är 28 bokstäver.
+                                            // Det längsta är 21 i ordlistan.
+                                            // Kattis gav fel för 29 så körde 90 och det funkade
+                                            // Skulle vara snyggt om den var dynamisk men ¯\_( ͡° ͜ʖ ͡°)_/¯.
         for (int i = 0; i <= wLen; i++) {
             dynProgMat[i][0] = i;
         }
