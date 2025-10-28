@@ -1,12 +1,24 @@
 public class Edge {
-    int to;
+    Node to;
+
     int capacity;
     int flow;
-    Edge reverse;
 
-    Edge(int to, int capacity) {
+    Edge restEdge;
+
+    Edge(Node from, Node to, int capacity) {
         this.to = to;
         this.capacity = capacity;
         this.flow = 0;
+
+        this.restEdge = new Edge(to, from, 0, this);
+        to.addEdge(this.restEdge);
+    }
+
+    Edge(Node from, Node to, int capacity, Edge restEdge) {
+        this.to = to;
+        this.capacity = capacity;
+        this.flow = 0;
+        this.restEdge = restEdge;
     }
 }

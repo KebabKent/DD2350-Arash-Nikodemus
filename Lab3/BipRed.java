@@ -12,7 +12,7 @@ public class BipRed {
 	Kattio io;
 
 	int x, y, e;
-	int vFlow, eFlow;
+	int vFlow;
 	int[][] edges;
 
 	void readBipartiteGraph() {
@@ -21,8 +21,7 @@ public class BipRed {
 		this.y = io.getInt();
 		this.e = io.getInt();
 
-		this.eFlow = this.e + this.x + this.y;
-		edges = new int[eFlow][2]; // Varje rad är en kant (a,b)
+		edges = new int[this.e][2]; // Varje rad är en kant (a,b)
 
 		// Läs in kanterna
 		for (int i = 0; i < this.e; i++) {
@@ -36,13 +35,13 @@ public class BipRed {
 
 	void writeFlowGraph() {
 		this.vFlow = this.x + this.y + 2;
-		int s = 1, t = vFlow;
+		int s = 1, t = this.vFlow;
 		int c = 1; // Kapacitet 1 för alla kanter
 
 		// Skriv ut antal hörn och kanter samt källa och sänka
-		io.println(vFlow);
+		io.println(this.vFlow);
 		io.println(s + " " + t);
-		io.println(eFlow);
+		io.println(this.x + this.y + this.e);
 
 		// s till X
 		for (int i = 2; i < x + 2; i++) {
@@ -71,7 +70,6 @@ public class BipRed {
 	}
 
 	int[][] maxEdges;
-	int maxX, maxY;
 	int maxMatch;
 
 	void readMaxFlowSolution() {
@@ -84,9 +82,7 @@ public class BipRed {
 		int totflow = io.getInt();
 		int e = io.getInt();
 
-		this.maxEdges = new int[e][2];
-		this.maxX = 0;
-		this.maxY = 0;
+		this.maxEdges = new int[totflow][2];
 		this.maxMatch = 0;
 
 		for (int i = 0; i < e; ++i) {
@@ -95,10 +91,8 @@ public class BipRed {
 			int b = io.getInt();
 			int f = io.getInt();
 
-			if (a == s) {
-				this.maxX++;
-			} else if (b == t) {
-				this.maxY++;
+			if (a == s || b == t) {
+				continue;
 			} else {
 				this.maxEdges[this.maxMatch][0] = a - 1;
 				this.maxEdges[this.maxMatch][1] = b - 1;
