@@ -5,8 +5,6 @@ public class Edge {
     int capacity;
     int flow;
 
-    int restFlow;
-
     Edge reverseEdge;
 
     Edge(Node from, Node to, int capacity) {
@@ -37,7 +35,7 @@ public class Edge {
 
     public void addFlow(int delta) {
         this.flow += delta;
-        this.reverseEdge.flow -= delta;
+        this.reverseEdge.flow = -this.flow;
     }
 
 }

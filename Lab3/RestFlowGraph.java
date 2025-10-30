@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ArrayDeque;
 import java.util.Queue;
+import java.util.Arrays;
 
 import java.util.LinkedList;
 
@@ -22,7 +23,7 @@ public class RestFlowGraph {
 
         constructFlowGraph();
         int maxflow = edmondsKarp();
-        System.out.println(maxflow);
+        writeOutput(maxflow);
 
         io.close();
     }
@@ -57,67 +58,20 @@ public class RestFlowGraph {
 
         }
 
-        for (Node node : this.nodes) {
-            System.out.println("Node " + (node != null ? node.id : "null") + " edges:");
-            if (node != null) {
-                node.printEdges();
-            }
-            System.out.println();
-        }
+        // for (Node node : this.nodes) {
+        // System.out.println("Node " + (node != null ? node.id : "null") + " edges:");
+        // if (node != null) {
+        // node.printEdges();
+        // }
+        // System.out.println();
+        // }
     }
-
-    class Path {
-        LinkedList<Edge> edgesInPath;
-        int minCapacity;
-
-        Path() {
-            this.edgesInPath = new LinkedList<>();
-            this.minCapacity = Integer.MAX_VALUE;
-        }
-
-        void addEdge(Edge edge) {
-            this.edgesInPath.add(edge);
-            if (edge.residualCapacity() < this.minCapacity) {
-                this.minCapacity = edge.residualCapacity();
-            }
-        }
-    }
-
-    /* { */
-    // c[u,v] är kapaciteten från u till v, f[u,v] är flödet, cf[u,v] är
-    // restkapaciteten.
-
-    // for varje kant (u,v) i grafen do
-    // -- f[u,v]:=0; f[v,u]:=0
-    // -- cf[u,v]:=c[u,v];
-    // -- cf[v,u]:=c[v,u];
-    // while det finns en stig p från s till t i restflödesgrafen do
-    // -- r:=min(cf[u,v]: (u,v) ingår i p)
-    // -- for varje kant (u,v) i p do
-    // -- -- f[u,v]:=f[u,v]+r; f[v,u]:= -f[u,v]
-    // -- -- cf[u,v]:=c[u,v] - f[u,v]; cf[v,u]:=c[v,u] - f[v,u]
-    /*
-     * for (Node node : this.nodes) {
-     * if (node == null)
-     * continue;
-     * for (Edge edge : node.edges) {
-     * edge.flow = 0;
-     * edge.reverseEdge.flow = 0;
-     * edge.restFlow = edge.capacity;
-     * edge.reverseEdge.restFlow = edge.reverseEdge.capacity;
-     * }
-     * }
-     * 
-     * Node sNode = this.nodes[1];
-     * Node tNode = this.nodes[this.nodes.length - 1];
-     * }
-     */
 
     int edmondsKarp() {
         int flow = 0;
         Edge[] path = new Edge[v + 1];
-        // path!= nulll
-        while (bfs(this.nodes, this.s, this.t, path)) {
+
+        while (bfs(path)) {
             // We have to save the smallest capacity in the path somewhere to use r
             int r = Integer.MAX_VALUE;
             for (Edge edge = path[t]; edge != null; edge = path[edge.from()]) {
@@ -129,76 +83,52 @@ public class RestFlowGraph {
             }
 
             flow += r;
-
-            /*
-             * edge.flow += r;
-             * edge.reverseEdge.flow = -edge.flow;
-             * 
-             * edge.restFlow = edge.capacity - edge.flow;
-             * edge.reverseEdge.restFlow = edge.reverseEdge.capacity -
-             * edge.reverseEdge.flow;}
-             */
-
-            // path = bFS(sNode, tNode);
         }
         return flow;
-
     }
 
-    boolean bfs(Node[] nodes, int s, int t, Edge[] path) {
+    boolean bfs(Edge[] path) {
+        Arrays.fill(path, null);
         // maybe add an array that keeps track of the paths
         boolean[] vis = new boolean[this.v + 1];
-        ArrayDeque<Integer> q = new ArrayDeque<>();
-        q.add(s);
+        ArrayDeque<Integer> queue = new ArrayDeque<>();
+        queue.add(this.s);
         vis[s] = true;
 
-        while (!q.isEmpty()) {
-            int u = q.poll();
-            for (Edge e : nodes[u].edges) {
-                int v = e.to.id;
-                if (!vis[v] && e.residualCapacity() > 0) {
-                    vis[v] = true;
-                    path[v] = e;
-                    if (v == t)
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+            if (this.nodes[current] == null)
+                continue;
+            for (Edge edge : this.nodes[current].edges) {
+                int neighborId = edge.to.id;
+                if (!vis[neighborId] && edge.residualCapacity() > 0) {
+                    vis[neighborId] = true;
+                    path[neighborId] = edge;
+                    if (neighborId == this.t)
                         return true; // found shortest augmenting path
-                    q.add(v);
+                    queue.add(neighborId);
                 }
             }
         }
         return false;
     }
 
-    // Path bFS(Node startNode, Node targetNode) {
-    // // While searching for path, save smallest capacity
-    // Path path = new Path();
+    void writeOutput(int maxflow) {
+        io.println(v);
+        io.println(s + " " + t + " " + maxflow);
 
-    // for (int i = 1; i < this.nodes.length; i++) {
-    // this.nodes[i].priority = -1; // -1 istället för oändlighet
-    // }
+        int k = 0;
+        for (Edge e : ogEdges) {
+            if (e.flow > 0)
+                k++;
+        }
+        io.println(k);
 
-    // boolean[] visited = new boolean[this.v + 1];
-
-    // Queue<Node> q = new ArrayDeque<>();
-
-    // q.add(startNode);
-    // startNode.priority = 0;
-
-    // while (!q.isEmpty()) {
-    // Node current = q.poll();
-
-    // for (Edge edge : current.edges) {
-    // Node neighbor = edge.to;
-
-    // if (neighbor.priority == -1) {
-    // q.add(neighbor);
-    // neighbor.priority = current.priority + 1;
-
-    // }
-    // }
-    // }
-
-    // return null;
-    // }
+        for (Edge e : ogEdges) {
+            if (e.flow > 0)
+                io.println(e.from() + " " + e.to.id + " " + e.flow);
+        }
+    }
 
     public static void main(String args[]) {
         new RestFlowGraph();
