@@ -12,9 +12,10 @@ public class Node {
         this.edges = new ArrayList<>();
     }
 
-    void addEdge(Node destinationNode, int capacity) {
+    Edge addEdge(Node destinationNode, int capacity) {
         Edge edge = new Edge(this, destinationNode, capacity);
         edges.add(edge);
+        return edge;
     }
 
     void addEdge(Edge edge) {
